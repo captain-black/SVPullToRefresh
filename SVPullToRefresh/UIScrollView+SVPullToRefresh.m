@@ -65,6 +65,12 @@ static char UIScrollViewPullToRefreshView;
 - (void)addPullToRefreshWithActionHandler:(void (^)(void))actionHandler {
     
     if(!self.pullToRefreshView) {
+        
+//        CGFloat oldDeviceWidth = 320.0;
+//        CGFloat newDeviceWidht = self.bounds.size.width;
+//        CGFloat offsetWidth = newDeviceWidht - oldDeviceWidth;
+//        SVPullToRefreshView *view = [[SVPullToRefreshView alloc] initWithFrame:CGRectMake(0 + (offsetWidth / 2.0), -SVPullToRefreshViewHeight, self.bounds.size.width - (offsetWidth / 2.0), SVPullToRefreshViewHeight)];
+        
         SVPullToRefreshView *view = [[SVPullToRefreshView alloc] initWithFrame:CGRectMake(0, -SVPullToRefreshViewHeight, self.bounds.size.width, SVPullToRefreshViewHeight)];
         view.pullToRefreshActionHandler = actionHandler;
         view.scrollView = self;
@@ -172,22 +178,22 @@ static char UIScrollViewPullToRefreshView;
     }
 }
 
-- (void)layoutSubviews {
-    CGFloat remainingWidth = self.superview.bounds.size.width-200;
-    float position = 0.50;
+- (void)layoutSubviews
+{
+    // fixed by subinghui, titleLabel居中显示, 箭头中心点位置在self.width / 6上
+    CGPoint center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
     
+    [self.titleLabel sizeToFit];
     CGRect titleFrame = self.titleLabel.frame;
-    titleFrame.origin.x = ceilf(remainingWidth*position+44);
+    titleFrame.origin.x = center.x - CGRectGetWidth(titleFrame) / 2;
     titleFrame.origin.y = self.bounds.size.height-(self.subtitleLabel.text ? 48 : 40);
     self.titleLabel.frame = titleFrame;
     
-    CGRect subtitleFrame = self.subtitleLabel.frame;
-    subtitleFrame.origin.x = titleFrame.origin.x;
-    subtitleFrame.origin.y = self.bounds.size.height-32;
-    self.subtitleLabel.frame = subtitleFrame;
+    [self.subtitleLabel sizeToFit];
+    self.subtitleLabel.center = CGPointMake(self.titleLabel.center.x, CGRectGetMaxY(self.titleLabel.frame) + 2);
     
     CGRect arrowFrame = self.arrow.frame;
-    arrowFrame.origin.x = ceilf(remainingWidth*position);
+    arrowFrame.origin.x = center.x / 3 - CGRectGetWidth(arrowFrame) / 2;
     self.arrow.frame = arrowFrame;
     
     self.activityIndicatorView.center = self.arrow.center;
